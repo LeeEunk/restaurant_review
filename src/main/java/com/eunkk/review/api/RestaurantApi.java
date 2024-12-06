@@ -1,10 +1,16 @@
 package com.eunkk.review.api;
 
 import com.eunkk.review.api.request.CreatedAndEditRestaurantRequest;
+import com.eunkk.review.service.RestaurantService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+@RequiredArgsConstructor
 @RestController
 public class RestaurantApi {
+    private final RestaurantService restaurantService;
+
+
     @GetMapping("/restaurants")
     public String getRestaurants() {
         return "This is getRestaurants";
@@ -17,25 +23,26 @@ public class RestaurantApi {
     }
 
     @PostMapping("/restaurant")
-    public String createRestaurant(
+    public void createRestaurant(
             @RequestBody CreatedAndEditRestaurantRequest request
             ) {
-        return "This is createRestaurant, name= " + request.getName() + ", address= " +request.getAddress()
-                + ", menu[0].name = " + request.getMenus().get(0).getName() + ", menu[0].price = " + request.getMenus().get(0).getPrice();
+        restaurantService.createRestaurant(request);
     }
 
     @PutMapping("/restaurant/{restaurantId}")
-    public String editRestaurant(
+    public void editRestaurant(
             @PathVariable Long restaurantId,
             @RequestBody CreatedAndEditRestaurantRequest request
     ) {
-        return "This is editRestaurant " + restaurantId + "name= " + request.getName() + ", address= " + request.getAddress();
+        restaurantService.editRestaurant(restaurantId, request);
     }
 
     @DeleteMapping("/restaurant/{restaurantId}")
     public String deleteRestaurant(
             @PathVariable Long restaurantId
     ){
-        return "This is deleteRestaurant " + restaurantId;
+        restaurantService.deleteRestaurant(restaurantId);
+
+        return restaurantId + " 번의 레스토랑이 삭제되었습니다.";
     }
 }
