@@ -1,9 +1,14 @@
 package com.eunkk.review.api;
 
 import com.eunkk.review.api.request.CreatedAndEditRestaurantRequest;
+import com.eunkk.review.api.response.RestaurantDetailView;
+import com.eunkk.review.api.response.RestaurantView;
 import com.eunkk.review.service.RestaurantService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.ZonedDateTime;
+import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
@@ -12,14 +17,15 @@ public class RestaurantApi {
 
 
     @GetMapping("/restaurants")
-    public String getRestaurants() {
-        return "This is getRestaurants";
+    public List<RestaurantView> getRestaurants() {
+        return restaurantService.getAllRestaurants();
     }
+    
     @GetMapping("/restaurant/{restaurantId}")
-    public String getRestaurant(
+    public RestaurantDetailView getRestaurant(
             @PathVariable Long restaurantId
     ) {
-        return "This is getRestaurant " + restaurantId;
+        return restaurantService.getRestaurantDetail(restaurantId);
     }
 
     @PostMapping("/restaurant")

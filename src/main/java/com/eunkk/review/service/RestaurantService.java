@@ -1,6 +1,8 @@
 package com.eunkk.review.service;
 
 import com.eunkk.review.api.request.CreatedAndEditRestaurantRequest;
+import com.eunkk.review.api.response.RestaurantDetailView;
+import com.eunkk.review.api.response.RestaurantView;
 import com.eunkk.review.model.MenuEntity;
 import com.eunkk.review.model.RestaurantEntity;
 import com.eunkk.review.repository.MenuRepository;
@@ -80,5 +82,43 @@ public class RestaurantService {
 
         List<MenuEntity> menus = menuRepository.findAllByRestaurantId(restaurantId);
         menuRepository.deleteAll(menus);
+    }
+
+    @Transactional(readOnly = true)// GET와 같은 읽기만 하는 곳엔 transactional 굳이 안써도 됨
+    public List<RestaurantView> getAllRestaurants() {
+        List<RestaurantEntity> restaurants = restaurantRepository.findAll();
+
+        return restaurants.stream().map((restaurant) -> RestaurantView.builder()
+                .id(restaurant.getId())
+                .name(restaurant.getName())
+                .address(restaurant.getAddress())
+                .createdAt(restaurant.getCreatedAt())
+                .updatedAt(restaurant.getUpdatedAt())
+                .build()
+        ).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public RestaurantDetailView getRestaurantDetail(Long restaurantId) {
+        RestaurantEntity restaurant = restaurantRepository.findById(restaurantId).orElseThrow();
+        List<MenuEntity> menus = menuRepository.findAllByRestaurantId(restaurantId);
+
+        return RestaurantDetailView.builder()
+                .id(restaurant.getId())
+                .name(restaurant.getName())
+                .address(restaurant.getAddress())
+                .createdAt(restaurant.getCreatedAt())
+                .updatedAt(restaurant.getUpdatedAt())
+                .menus(
+                        menus.stream().map((menu) -> RestaurantDetailView.Menu.builder()
+                                .id(menu.getId())
+                                .name(menu.getName())
+                                .price(menu.getPrice())
+                                .createdAt(menu.getCreatedAt())
+                                .updatedAt(menu.getUpdatedAt())
+                                .build()
+                        ).toList()
+                )
+                .build();
     }
 }
